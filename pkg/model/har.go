@@ -1,7 +1,6 @@
 package model
 
 import (
-	"net"
 	"time"
 )
 
@@ -45,16 +44,16 @@ type PageTimings struct {
 }
 
 type Entry struct {
-	Pageref         string     `json:"pageref,omitempty"`        // Reference to parent page
-	StartedDateTime time.Time  `json:"startedDateTime"`          // Date and time stamp of the request start
-	Time            int        `json:"time"`                     // Total elapsed time of the request in milliseconds
-	Request         Request    `json:"request"`                  // Detailed info about the request
-	Response        Response   `json:"response"`                 // Detailed info about the response
-	Cache           Cache      `json:"cache"`                    // Info about cache usage
-	Timings         Timings    `json:"timings"`                  // Detailed timing info about request/response round trip
-	ServerIPAddress net.IPAddr `json:"serverIPAddress,omitzero"` // IP address of the server that was connected (result of DNS resolution)
-	Connection      string     `json:"connection,omitempty"`     // Unique ID of the parent TCP/IP connection, can be the client port number. Note that a port number doesn't have to be unique identifier in cases where the port is shared for more connections. If the port isn't available for the application, any other unique connection ID can be used instead (e.g. connection index). Leave out this field if the application doesn't support this info.
-	Comment         string     `json:"comment,omitempty"`        // A comment provided by the user or the application
+	Pageref         string    `json:"pageref,omitempty"`         // Reference to parent page
+	StartedDateTime time.Time `json:"startedDateTime"`           // Date and time stamp of the request start
+	Time            int       `json:"time"`                      // Total elapsed time of the request in milliseconds
+	Request         Request   `json:"request"`                   // Detailed info about the request
+	Response        Response  `json:"response"`                  // Detailed info about the response
+	Cache           Cache     `json:"cache"`                     // Info about cache usage
+	Timings         Timings   `json:"timings"`                   // Detailed timing info about request/response round trip
+	ServerIPAddress string    `json:"serverIPAddress,omitempty"` // IP address of the server that was connected (result of DNS resolution)
+	Connection      string    `json:"connection,omitempty"`      // Unique ID of the parent TCP/IP connection, can be the client port number. Note that a port number doesn't have to be unique identifier in cases where the port is shared for more connections. If the port isn't available for the application, any other unique connection ID can be used instead (e.g. connection index). Leave out this field if the application doesn't support this info.
+	Comment         string    `json:"comment,omitempty"`         // A comment provided by the user or the application
 }
 
 type Request struct {
@@ -137,7 +136,7 @@ type Cache struct {
 }
 
 type CacheData struct {
-	Expires    time.Time `json:"expires,omitzero"`  // Expiration time of the cache entry
+	// Expires    time.Time `json:"expires,omitzero"`  // Expiration time of the cache entry
 	LastAccess time.Time `json:"lastAccess"`        // The last time the cache entry was opened
 	ETag       string    `json:"eTag"`              // Etag
 	HitCount   int       `json:"hitCount"`          // The number of times the cache entry has been opened
