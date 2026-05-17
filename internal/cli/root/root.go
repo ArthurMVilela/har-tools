@@ -4,7 +4,7 @@ import (
 	"encoding/json"
 	"os"
 
-	"github.com/ArthurMVilela/har-tools/internal/model"
+	"github.com/ArthurMVilela/har-tools/pkg/model"
 	"github.com/spf13/cobra"
 )
 
