@@ -1,16 +1,9 @@
 package main
 
 import (
-	"github.com/spf13/cobra"
+	"github.com/ArthurMVilela/har-tools/internal/cli/root"
 )
 
-var rootCmd = &cobra.Command{
-	Use: "har-tools",
-	Run: func(cmd *cobra.Command, args []string) {
-		cmd.Println("Hello")
-	},
-}
-
 func main() {
-	rootCmd.Execute()
+	root.Command().Execute()
 }
