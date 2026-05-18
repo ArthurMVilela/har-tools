@@ -1,10 +1,7 @@
 package root
 
 import (
-	"encoding/json"
-	"os"
-
-	"github.com/ArthurMVilela/har-tools/pkg/model"
+	"github.com/ArthurMVilela/har-tools/internal/encoding"
 	"github.com/spf13/cobra"
 )
 
@@ -16,9 +13,9 @@ var rootCmd = &cobra.Command{
 var file string
 
 func init() {
-	rootCmd.Flags().StringVarP(&file, "file", "f", "", "Path to HAR file to be read.")
-	rootCmd.MarkFlagFilename("file", "har")
-	rootCmd.MarkFlagRequired("file")
+	rootCmd.PersistentFlags().StringVarP(&file, "file", "f", "", "Path to HAR file to be read.")
+	rootCmd.MarkPersistentFlagFilename("file", "har")
+	rootCmd.MarkPersistentFlagRequired("file")
 }
 
 func Command() *cobra.Command {
@@ -26,21 +23,17 @@ func Command() *cobra.Command {
 }
 
 func execute(cmd *cobra.Command, args []string) {
-	var har model.HAR
-
-	rawFile, err := os.ReadFile(file)
+	har, err := encoding.LoadHARFromFile(file)
 	if err != nil {
 		cmd.PrintErr(err)
 		return
 	}
 
-	err = json.Unmarshal(rawFile, &har)
+	out, err := encoding.EncodeToJSON(har, true)
 	if err != nil {
 		cmd.PrintErr(err)
 		return
 	}
 
-	cmd.Printf("%+v\n", har.Log.Browser)
-	cmd.Printf("%+v\n", har.Log.Creator)
-	cmd.Printf("%+v\n", har.Log.Pages)
+	cmd.Println(string(out))
 }
