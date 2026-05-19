@@ -27,10 +27,10 @@ func ParseFromJSON(data []byte) (*model.HAR, error) {
 	return har, nil
 }
 
-func EncodeToJSON(har *model.HAR, pretty bool) ([]byte, error) {
+func EncodeToJSON(src any, pretty bool) ([]byte, error) {
 	if pretty {
-		return json.MarshalIndent(har, "", "	")
+		return json.MarshalIndent(src, "", "	")
 	}
 
-	return json.Marshal(har)
+	return json.Marshal(src)
 }

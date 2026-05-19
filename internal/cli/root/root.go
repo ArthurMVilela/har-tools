@@ -1,6 +1,7 @@
 package root
 
 import (
+	"github.com/ArthurMVilela/har-tools/internal/cli/entries"
 	"github.com/ArthurMVilela/har-tools/internal/encoding"
 	"github.com/spf13/cobra"
 )
@@ -13,6 +14,8 @@ var rootCmd = &cobra.Command{
 var file string
 
 func init() {
+	rootCmd.AddCommand(entries.Command())
+
 	rootCmd.PersistentFlags().StringVarP(&file, "file", "f", "", "Path to HAR file to be read.")
 	rootCmd.MarkPersistentFlagFilename("file", "har")
 	rootCmd.MarkPersistentFlagRequired("file")
