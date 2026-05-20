@@ -1,9 +1,13 @@
 package main
 
 import (
+	"context"
+
 	"github.com/ArthurMVilela/har-tools/internal/cli/root"
 )
 
 func main() {
-	root.Command().Execute()
+	ctx := context.Background()
+
+	root.Command().ExecuteContext(ctx)
 }
