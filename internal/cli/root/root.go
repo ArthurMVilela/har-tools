@@ -10,7 +10,7 @@ import (
 var rootCmd = &cobra.Command{
 	Use:               "har-tools",
 	PersistentPreRunE: persistencePreRun,
-	Run:               execute,
+	RunE:              execute,
 }
 
 var file string
@@ -48,18 +48,18 @@ func persistencePreRun(cmd *cobra.Command, args []string) error {
 	return nil
 }
 
-func execute(cmd *cobra.Command, args []string) {
+func execute(cmd *cobra.Command, args []string) error {
 	har, err := encoding.LoadHARFromFile(file)
 	if err != nil {
-		cmd.PrintErr(err)
-		return
+		return err
 	}
 
 	out, err := encoding.EncodeToJSON(har, true)
 	if err != nil {
-		cmd.PrintErr(err)
-		return
+		return err
 	}
 
 	cmd.Println(string(out))
+
+	return nil
 }

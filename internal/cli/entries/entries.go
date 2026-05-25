@@ -1,11 +1,9 @@
 package entries
 
 import (
-	"strings"
-
 	"github.com/ArthurMVilela/har-tools/internal/encoding"
-	"github.com/ArthurMVilela/har-tools/pkg/model"
-	"github.com/antchfx/jsonquery"
+	"github.com/ArthurMVilela/har-tools/internal/filtering"
+	"github.com/rs/zerolog"
 	"github.com/spf13/cobra"
 )
 
@@ -15,7 +13,7 @@ var entriesCmd = &cobra.Command{
 }
 
 func init() {
-	entriesCmd.Flags().String("json-content-filter", "", "Apply xPath filter to entries json content")
+	entriesCmd.Flags().String("xpath-filter-content", "", "Apply xPath filter to entries' responses' content (body). It will only work on entries which response's content types are either json, xml or html.")
 }
 
 func Command() *cobra.Command {
@@ -23,6 +21,8 @@ func Command() *cobra.Command {
 }
 
 func execute(cmd *cobra.Command, args []string) {
+	logger := zerolog.Ctx(cmd.Context())
+
 	file, err := cmd.Flags().GetString("file")
 	if err != nil {
 		cmd.PrintErr(err)
@@ -37,45 +37,30 @@ func execute(cmd *cobra.Command, args []string) {
 
 	entries := har.Log.Entries
 
-	jsonFilter, _ := cmd.Flags().GetString("json-content-filter")
+	var filters []filtering.EntryFilter
+
+	jsonFilter, _ := cmd.Flags().GetString("xpath-filter-content")
 	if len(jsonFilter) > 0 {
-		entries, err = filterEntries(entries, jsonFilter)
-		if err != nil {
-			cmd.PrintErr(err)
-			return
-		}
+		filters = append(filters, filtering.XPathEntryContentFilter(jsonFilter))
 	}
 
-	out, err := encoding.EncodeToJSON(entries, true)
+	processor, err := filtering.NewEntryProcessor(filtering.WithLogger(logger), filtering.WithEntryFilters(filters...))
+	if err != nil {
+		cmd.PrintErr(err)
+		return
+	}
+
+	filteredEntries, err := processor.ApplyFilters(entries)
+	if err != nil {
+		cmd.PrintErr(err)
+		return
+	}
+
+	out, err := encoding.EncodeToJSON(filteredEntries, true)
 	if err != nil {
 		cmd.PrintErr(err)
 		return
 	}
 
 	cmd.Println(string(out))
-}
-
-func filterEntries(entries []model.Entry, filter string) ([]model.Entry, error) {
-	var filtered []model.Entry
-
-	for _, entry := range entries {
-		if !strings.Contains(entry.Response.Content.MimeType, "json") {
-			continue
-		}
-		reader := strings.NewReader(entry.Response.Content.Text)
-		node, err := jsonquery.Parse(reader)
-		if err != nil {
-			continue
-		}
-
-		node, err = jsonquery.Query(node, filter)
-		if err != nil {
-			continue
-		}
-		if node != nil {
-			filtered = append(filtered, entry)
-		}
-	}
-
-	return filtered, nil
 }
