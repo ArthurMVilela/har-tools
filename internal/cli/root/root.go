@@ -20,9 +20,11 @@ func init() {
 
 	rootCmd.PersistentFlags().BoolP("debug", "d", false, "Toogles debug mode, which logs in debug information.")
 
-	rootCmd.PersistentFlags().StringVarP(&file, "file", "f", "", "Path to HAR file to be read.")
+	rootCmd.PersistentFlags().StringVarP(&file, "file", "f", "", "Path to HAR file to be processed.")
 	rootCmd.MarkPersistentFlagFilename("file", "har")
 	rootCmd.MarkPersistentFlagRequired("file")
+
+	rootCmd.PersistentFlags().BoolP("pretty", "p", false, "Toogles pretty outpput: with line breaking and indentation. Ideal for human readability.")
 }
 
 func Command() *cobra.Command {

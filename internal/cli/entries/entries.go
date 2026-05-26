@@ -70,7 +70,9 @@ func execute(cmd *cobra.Command, args []string) {
 		return
 	}
 
-	out, err := encoding.EncodeToJSON(filteredEntries, true)
+	prettyPrint, _ := cmd.Flags().GetBool("pretty")
+
+	out, err := encoding.EncodeToJSON(filteredEntries, prettyPrint)
 	if err != nil {
 		cmd.PrintErr(err)
 		return
