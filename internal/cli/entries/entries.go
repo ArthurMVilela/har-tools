@@ -1,6 +1,8 @@
 package entries
 
 import (
+	"regexp"
+
 	"github.com/ArthurMVilela/har-tools/internal/encoding"
 	"github.com/ArthurMVilela/har-tools/internal/filtering"
 	"github.com/rs/zerolog"
@@ -14,6 +16,7 @@ var entriesCmd = &cobra.Command{
 
 func init() {
 	entriesCmd.Flags().String("xpath-filter-content", "", "Apply xPath filter to entries' responses' content (body). It will only work on entries which response's content types are either json, xml or html.")
+	entriesCmd.Flags().String("mime-filter-content", "", "Filters out entries by the response's content MIME type by the given regex filter.")
 }
 
 func Command() *cobra.Command {
@@ -38,6 +41,17 @@ func execute(cmd *cobra.Command, args []string) {
 	entries := har.Log.Entries
 
 	var filters []filtering.EntryFilter
+
+	mimeFilter, _ := cmd.Flags().GetString("mime-filter-content")
+	if len(mimeFilter) > 0 {
+		if _, err := regexp.Compile(mimeFilter); err != nil {
+			cmd.PrintErrln(err)
+			return
+		}
+
+		logger.Debug().Msgf("Applying filter: %s", mimeFilter)
+		filters = append(filters, filtering.MimeTypeContentFilter(mimeFilter))
+	}
 
 	jsonFilter, _ := cmd.Flags().GetString("xpath-filter-content")
 	if len(jsonFilter) > 0 {

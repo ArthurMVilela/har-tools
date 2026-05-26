@@ -3,6 +3,7 @@ package filtering
 import (
 	"errors"
 	"fmt"
+	"regexp"
 	"slices"
 	"strings"
 
@@ -18,7 +19,7 @@ type EntryProcessor struct {
 
 type EntryProcessorOption func(p *EntryProcessor) error
 
-type EntryFilter func(har model.Entry) (bool, error)
+type EntryFilter func(entry model.Entry) (bool, error)
 
 func NewEntryProcessor(options ...EntryProcessorOption) (*EntryProcessor, error) {
 	processor := new(EntryProcessor)
@@ -42,11 +43,11 @@ func (proc *EntryProcessor) ApplyFilters(entries []model.Entry) ([]model.Entry, 
 		for _, filter := range proc.filters {
 			passes, err := filter(entry)
 			if err != nil {
-				proc.logger.Debug().Err(err).Msgf("Unable to process filter. Entry: %+v", entry)
+				proc.logger.Debug().Err(err).Msgf("Unable to process filter: %v. Entry: %+v", filter, entry)
 				continue
 			}
 			if passes {
-				return true
+				return false
 			}
 		}
 		return true
@@ -95,4 +96,10 @@ func satisfyJSONXPathFilter(text string, filter string) (bool, error) {
 	}
 
 	return node != nil, nil
+}
+
+func MimeTypeContentFilter(pattern string) EntryFilter {
+	return func(entry model.Entry) (bool, error) {
+		return regexp.MatchString(pattern, entry.Response.Content.MimeType)
+	}
 }
