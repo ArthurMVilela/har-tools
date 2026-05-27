@@ -1,8 +1,8 @@
 package root
 
 import (
+	"github.com/ArthurMVilela/har-tools/internal/cli/cmdflags"
 	"github.com/ArthurMVilela/har-tools/internal/cli/entries"
-	cmdflags "github.com/ArthurMVilela/har-tools/internal/cli/flags"
 	"github.com/ArthurMVilela/har-tools/internal/encoding"
 	"github.com/rs/zerolog"
 	"github.com/spf13/cobra"

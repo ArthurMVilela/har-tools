@@ -1,4 +1,4 @@
-package flags
+package cmdflags
 
 const (
 	FileFlag        = "file"
@@ -7,4 +7,8 @@ const (
 	DebugShortFlag  = "d"
 	PrettyFlag      = "pretty"
 	PrettyShortFlag = "p"
+
+	EntriesRequestURLFilterFlag      = "url-filter"
+	EntriesXPathContentFilterFlag    = "xpath-filter-content"
+	EntriesMimeTypeContentFilterFlag = "mime-filter-content"
 )

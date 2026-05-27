@@ -103,3 +103,9 @@ func MimeTypeContentFilter(pattern string) EntryFilter {
 		return regexp.MatchString(pattern, entry.Response.Content.MimeType)
 	}
 }
+
+func URLFilter(pattern string) EntryFilter {
+	return func(entry model.Entry) (bool, error) {
+		return regexp.MatchString(pattern, entry.Request.URL)
+	}
+}

@@ -3,7 +3,7 @@ package entries
 import (
 	"regexp"
 
-	cmdflags "github.com/ArthurMVilela/har-tools/internal/cli/flags"
+	"github.com/ArthurMVilela/har-tools/internal/cli/cmdflags"
 	"github.com/ArthurMVilela/har-tools/internal/encoding"
 	"github.com/ArthurMVilela/har-tools/internal/filtering"
 	"github.com/rs/zerolog"
@@ -16,6 +16,7 @@ func Command() *cobra.Command {
 		Run: execute,
 	}
 
+	entriesCmd.Flags().String(cmdflags.EntriesRequestURLFilterFlag, "", "Filters out entries by the entries request's url by the given regex filter.")
 	entriesCmd.Flags().String(cmdflags.EntriesXPathContentFilterFlag, "", "Apply xPath filter to entries' responses' content (body). It will only work on entries which response's content types are either json, xml or html.")
 	entriesCmd.Flags().String(cmdflags.EntriesMimeTypeContentFilterFlag, "", "Filters out entries by the response's content MIME type by the given regex filter.")
 
@@ -40,6 +41,17 @@ func execute(cmd *cobra.Command, args []string) {
 	entries := har.Log.Entries
 
 	var filters []filtering.EntryFilter
+
+	urlFilter, _ := cmd.Flags().GetString(cmdflags.EntriesRequestURLFilterFlag)
+	if len(urlFilter) > 0 {
+		if _, err := regexp.Compile(urlFilter); err != nil {
+			cmd.PrintErrln(err)
+			return
+		}
+
+		logger.Debug().Msgf("Applying filter: %s", urlFilter)
+		filters = append(filters, filtering.URLFilter(urlFilter))
+	}
 
 	mimeFilter, _ := cmd.Flags().GetString("mime-filter-content")
 	if len(mimeFilter) > 0 {
