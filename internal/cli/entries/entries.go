@@ -3,23 +3,22 @@ package entries
 import (
 	"regexp"
 
+	cmdflags "github.com/ArthurMVilela/har-tools/internal/cli/flags"
 	"github.com/ArthurMVilela/har-tools/internal/encoding"
 	"github.com/ArthurMVilela/har-tools/internal/filtering"
 	"github.com/rs/zerolog"
 	"github.com/spf13/cobra"
 )
 
-var entriesCmd = &cobra.Command{
-	Use: "entries",
-	Run: execute,
-}
-
-func init() {
-	entriesCmd.Flags().String("xpath-filter-content", "", "Apply xPath filter to entries' responses' content (body). It will only work on entries which response's content types are either json, xml or html.")
-	entriesCmd.Flags().String("mime-filter-content", "", "Filters out entries by the response's content MIME type by the given regex filter.")
-}
-
 func Command() *cobra.Command {
+	entriesCmd := &cobra.Command{
+		Use: "entries",
+		Run: execute,
+	}
+
+	entriesCmd.Flags().String(cmdflags.EntriesXPathContentFilterFlag, "", "Apply xPath filter to entries' responses' content (body). It will only work on entries which response's content types are either json, xml or html.")
+	entriesCmd.Flags().String(cmdflags.EntriesMimeTypeContentFilterFlag, "", "Filters out entries by the response's content MIME type by the given regex filter.")
+
 	return entriesCmd
 }
 

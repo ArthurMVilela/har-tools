@@ -2,39 +2,35 @@ package root
 
 import (
 	"github.com/ArthurMVilela/har-tools/internal/cli/entries"
+	cmdflags "github.com/ArthurMVilela/har-tools/internal/cli/flags"
 	"github.com/ArthurMVilela/har-tools/internal/encoding"
 	"github.com/rs/zerolog"
 	"github.com/spf13/cobra"
 )
 
-var rootCmd = &cobra.Command{
-	Use:               "har-tools",
-	PersistentPreRunE: persistencePreRun,
-	RunE:              execute,
-}
+func Command() *cobra.Command {
+	rootCmd := &cobra.Command{
+		Use:               "har-tools",
+		PersistentPreRunE: persistencePreRun,
+		RunE:              execute,
+	}
 
-var file string
-
-func init() {
 	rootCmd.AddCommand(entries.Command())
 
-	rootCmd.PersistentFlags().BoolP("debug", "d", false, "Toogles debug mode, which logs in debug information.")
+	rootCmd.PersistentFlags().BoolP(cmdflags.DebugFlag, cmdflags.DebugShortFlag, false, "Toogles debug mode, which logs in debug information.")
+	rootCmd.PersistentFlags().StringP(cmdflags.FileFlag, cmdflags.FileShortFlag, "", "Path to HAR file to be processed.")
+	rootCmd.PersistentFlags().BoolP(cmdflags.PrettyFlag, cmdflags.PrettyShortFlag, false, "Toogles pretty outpput: with line breaking and indentation. Ideal for human readability.")
 
-	rootCmd.PersistentFlags().StringVarP(&file, "file", "f", "", "Path to HAR file to be processed.")
-	rootCmd.MarkPersistentFlagFilename("file", "har")
-	rootCmd.MarkPersistentFlagRequired("file")
+	rootCmd.MarkPersistentFlagFilename(cmdflags.FileFlag, "har")
+	rootCmd.MarkPersistentFlagRequired(cmdflags.FileFlag)
 
-	rootCmd.PersistentFlags().BoolP("pretty", "p", false, "Toogles pretty outpput: with line breaking and indentation. Ideal for human readability.")
-}
-
-func Command() *cobra.Command {
 	return rootCmd
 }
 
 func persistencePreRun(cmd *cobra.Command, args []string) error {
 	logger := zerolog.New(zerolog.NewConsoleWriter()).With().Timestamp().Logger().Level(zerolog.ErrorLevel)
 
-	debugOn, err := cmd.Flags().GetBool("debug")
+	debugOn, err := cmd.Flags().GetBool(cmdflags.DebugFlag)
 	if err != nil {
 		return err
 	}
@@ -51,7 +47,12 @@ func persistencePreRun(cmd *cobra.Command, args []string) error {
 }
 
 func execute(cmd *cobra.Command, args []string) error {
-	har, err := encoding.LoadHARFromFile(file)
+	filepath, err := cmd.Flags().GetString(cmdflags.FileFlag)
+	if err != nil {
+		return err
+	}
+
+	har, err := encoding.LoadHARFromFile(filepath)
 	if err != nil {
 		return err
 	}
