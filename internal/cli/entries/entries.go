@@ -3,6 +3,7 @@ package entries
 import (
 	"regexp"
 
+	"github.com/ArthurMVilela/har-tools/internal/cli"
 	"github.com/ArthurMVilela/har-tools/internal/cli/cmdflags"
 	"github.com/ArthurMVilela/har-tools/internal/encoding"
 	"github.com/ArthurMVilela/har-tools/internal/filtering"
@@ -10,7 +11,7 @@ import (
 	"github.com/spf13/cobra"
 )
 
-func Command() *cobra.Command {
+func Command(deps *cli.CLIDependencies) *cobra.Command {
 	entriesCmd := &cobra.Command{
 		Use: "entries",
 		Run: execute,
